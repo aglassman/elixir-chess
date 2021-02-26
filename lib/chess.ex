@@ -165,7 +165,7 @@ defmodule Chess do
     end
   end
 
-  # Subsuquent Moves
+  # Subsequent Moves
   def valid_piece_movement(
         state,
         {{:black, :pawn} = piece, {from_rank, file}, {to_rank, file} = to} = move
@@ -230,8 +230,8 @@ defmodule Chess do
   end
 
   defp validate_castle(state, color, rook_start, path) do
-    with {:moved, nil} <- {:moved, first_move(state, color, :king)},
-         {:moved, nil} <- {:moved, first_move(state, color, :rook, rook_start)},
+    with {:moved, nil} <- {:moved, find_first_move(state, color, :king)},
+         {:moved, nil} <- {:moved, find_first_move(state, color, :rook, rook_start)},
          {:path, nil} <- {:path, Enum.find(path, &Map.has_key?(state, &1))},
          {:check, nil} <- in_check(state, :white) do
       :ok
@@ -247,7 +247,7 @@ defmodule Chess do
     end
   end
 
-  defp first_move(%{moves: moves}, color, piece) do
+  defp find_first_move(%{moves: moves}, color, piece) do
     Enum.find(
       moves,
       fn
@@ -257,7 +257,7 @@ defmodule Chess do
     )
   end
 
-  defp first_move(%{moves: moves}, color, piece, from) do
+  defp find_first_move(%{moves: moves}, color, piece, from) do
     Enum.find(
       moves,
       fn
