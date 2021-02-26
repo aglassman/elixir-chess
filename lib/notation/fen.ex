@@ -51,16 +51,16 @@ defmodule Chess.Notation.Fen do
   end
 
   defp check_castle(state, "K"),
-    do: Chess.valid_piece_movement(state, {{:white, :king}, {1, 5}, {1, 3}}) |> IO.inspect()
+    do: Chess.valid_piece_movement(state, {{:white, :king}, {1, 5}, {1, 3}})
 
   defp check_castle(state, "Q"),
-    do: Chess.valid_piece_movement(state, {{:white, :king}, {1, 5}, {1, 7}}) |> IO.inspect()
+    do: Chess.valid_piece_movement(state, {{:white, :king}, {1, 5}, {1, 7}})
 
   defp check_castle(state, "k"),
-    do: Chess.valid_piece_movement(state, {{:black, :king}, {8, 5}, {8, 7}}) |> IO.inspect()
+    do: Chess.valid_piece_movement(state, {{:black, :king}, {8, 5}, {8, 7}})
 
   defp check_castle(state, "q"),
-    do: Chess.valid_piece_movement(state, {{:black, :king}, {8, 5}, {8, 3}}) |> IO.inspect()
+    do: Chess.valid_piece_movement(state, {{:black, :king}, {8, 5}, {8, 3}})
 
   @impl Notation
   def to_string(state) do

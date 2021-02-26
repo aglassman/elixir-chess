@@ -1,6 +1,5 @@
 defmodule ChessTest do
   use ExUnit.Case
-  doctest Chess
 
   test "New game to FEN" do
     fen =
