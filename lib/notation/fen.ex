@@ -30,14 +30,17 @@ defmodule Chess.Notation.Fen do
         rank,
         {"", 0},
         fn
-          nil, {fen, 7} -> {"#{fen}8", 0}
+          nil, {fen, 7} -> {"8", 0}
           nil, {fen, spaces} -> {fen, spaces + 1}
           peice, {fen, 0} -> {"#{fen}#{peice}", 0}
           peice, {fen, spaces} -> {"#{fen}#{spaces}#{peice}", 0}
         end
       )
     end)
-    |> Enum.map(fn {x, _} -> x end)
+    |> Enum.map(fn
+      {fen, 0} -> fen
+      {fen, remaining} -> "#{fen}#{remaining}"
+    end)
     |> Enum.join("/")
   end
 

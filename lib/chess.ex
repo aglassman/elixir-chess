@@ -22,6 +22,17 @@ defmodule Chess do
 
   @colors [:black, :white]
 
+  @files %{
+    1 => "a",
+    2 => "b",
+    3 => "c",
+    4 => "d",
+    5 => "e",
+    6 => "f",
+    7 => "g",
+    8 => "h"
+  }
+
   @defmodule """
   Game state is represented by a map defined by the state() type. Values include:
 
@@ -134,7 +145,7 @@ defmodule Chess do
   defp next_player(state), do: %{state | current: :black}
 
   ### Pawn Movement
-  # Opening moves
+  # two square moves
   def valid_piece_movement(
         state,
         {{:black, :pawn} = piece, {7, file}, {to_rank, file} = to} = move
@@ -196,6 +207,31 @@ defmodule Chess do
     end
   end
 
+  # en passant
+  def valid_piece_movement(
+        state,
+        {{:black, :pawn} = piece, {from_rank, from_file}, {to_rank, to_file}} = move
+      ) when from_file in [to_file + 1, to_file - 1] and from_rank - to_rank == 1 do
+
+    case last_move(state) do
+      {{:white, :pawn}, {r1, ^to_file}, {r2, ^to_file}} when r2 - r1 == 2 -> {:ok, move}
+      _ -> {:invalid_move, "Invalid pawn move."}
+    end
+
+  end
+
+  def valid_piece_movement(
+        state,
+        {{:white, :pawn} = piece, {from_rank, from_file}, {to_rank, to_file}} = move
+      ) when from_file in [to_file + 1, to_file - 1] and to_rank - from_rank == 1 do
+
+    case last_move(state) |> IO.inspect do
+      {{:black, :pawn}, {r1, ^to_file}, {r2, ^to_file}} when r1 - r2 == 2 -> {:ok, move}
+      _ -> {:invalid_move, "Invalid pawn move."}
+    end
+
+  end
+
   # Castling
   def valid_piece_movement(state, {{:white, :king}, {1, 5}, {1, 3}} = move) do
     with :ok <- validate_castle(state, :white, {1, 1}, [{1, 2}, {1, 3}, {1, 4}]) do
@@ -229,6 +265,12 @@ defmodule Chess do
     {:check, nil}
   end
 
+  def file(file_index) when is_integer(file_index) and file_index > 0 and file_index <= 8 do
+    Map.get(@files, file_index)
+  end
+
+  def file(_), do: {:error, "Invalid file index."}
+
   defp validate_castle(state, color, rook_start, path) do
     with {:moved, nil} <- {:moved, find_first_move(state, color, :king)},
          {:moved, nil} <- {:moved, find_first_move(state, color, :rook, rook_start)},
@@ -246,6 +288,9 @@ defmodule Chess do
         {:invalid_move, "The king is under threat by #{inspect(threat)}, and cannot castle."}
     end
   end
+
+  defp last_move(%{moves: []}), do: nil
+  defp last_move(%{moves: [last_move | _]}), do: last_move
 
   defp find_first_move(%{moves: moves}, color, piece) do
     Enum.find(
