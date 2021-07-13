@@ -12,10 +12,10 @@ defmodule PawnTest do
     end
   end
 
-  test "Test Pawn Capture" do
-    state = Chess.init()
-
-  end
+#  test "Test Pawn Capture" do
+#    state = Chess.init()
+#
+#  end
 
   test "Test Pawn Capture - Valid En Passant" do
     state = Chess.init(
@@ -28,13 +28,13 @@ defmodule PawnTest do
     assert {:ok, _} = Chess.valid_piece_movement(state, {{:white, :pawn}, {5,5}, {6,6}})
   end
 
-  test "Test Pawn Capture - Invalid En Passant" do
-    state = Chess.init()
-
-  end
-
-  test "Test invalid Pawn Movements" do
-    state = Chess.init()
-
-  end
+#  test "Test Pawn Capture - Invalid En Passant" do
+#    state = Chess.init()
+#
+#  end
+#
+#  test "Test invalid Pawn Movements" do
+#    state = Chess.init()
+#
+#  end
 end

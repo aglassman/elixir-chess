@@ -1,7 +1,6 @@
 defmodule Chess.Notation do
-  import Chess
 
-  @callback to_string(Chess.state()) :: String.t()
+  @callback to_string(Chess.state(), opts :: keyword()) :: String.t()
 
-  @callback to_state(String.t()) :: Chess.state()
+  @callback to_state(String.t(), opts :: keyword()) :: Chess.state()
 end

@@ -18,6 +18,37 @@ defmodule Chess.Notation.Fen do
     {:black, :king} => "k"
   }
 
+  @impl Notation
+  def to_string(state, _opts \\ []) do
+    [positions(state), active_color(state), castle(state)]
+    |> Enum.join(" ")
+    |> String.trim()
+  end
+
+  @impl Notation
+  def to_state(string, _opts \\ []) do
+    inverted_map = Map.new(@fen_map, fn {piece, fen} -> {fen, piece} end)
+
+    board = string
+            |> String.graphemes()
+            |> Enum.reject(&(&1 == "/"))
+            |> Enum.flat_map(fn fen ->
+      case Map.get(inverted_map, fen) do
+        nil -> for _n <- 1..String.to_integer(fen), do: nil
+        piece -> [piece]
+      end
+    end)
+            |> Enum.with_index()
+            |> Enum.map(fn {fen, index} -> {fen, rem(index, 8)} end)
+            |> Enum.chunk_every(8)
+            |> Enum.with_index()
+            |> Enum.reduce([],fn {row, rank}, acc -> [Enum.map(row, fn {piece, file} -> {{8 - rank, 1 + file}, piece} end) | acc] end)
+            |> List.flatten()
+            |> Enum.reject(fn {_, piece} -> is_nil(piece) end)
+
+    Chess.init(board: board)
+  end
+
   defp positions(state) do
     for rank <- 8..1, file <- 1..8 do
       {rank, file}
@@ -30,7 +61,7 @@ defmodule Chess.Notation.Fen do
         rank,
         {"", 0},
         fn
-          nil, {fen, 7} -> {"8", 0}
+          nil, {_, 7} -> {"8", 0}
           nil, {fen, spaces} -> {fen, spaces + 1}
           peice, {fen, 0} -> {"#{fen}#{peice}", 0}
           peice, {fen, spaces} -> {"#{fen}#{spaces}#{peice}", 0}
@@ -64,35 +95,4 @@ defmodule Chess.Notation.Fen do
 
   defp check_castle(state, "q"),
     do: Chess.valid_piece_movement(state, {{:black, :king}, {8, 5}, {8, 3}})
-
-  @impl Notation
-  def to_string(state) do
-    [positions(state), active_color(state), castle(state)]
-    |> Enum.join(" ")
-    |> String.trim()
-  end
-
-  @impl Notation
-  def to_state(string) do
-    inverted_map = Map.new(@fen_map, fn {piece, fen} -> {fen, piece} end)
-
-    board = string
-    |> String.graphemes()
-    |> Enum.reject(&(&1 == "/"))
-    |> Enum.flat_map(fn fen ->
-      case Map.get(inverted_map, fen) do
-        nil -> for n <- 1..String.to_integer(fen), do: nil
-        piece -> [piece]
-      end
-    end)
-    |> Enum.with_index()
-    |> Enum.map(fn {fen, index} -> {fen, rem(index, 8)} end)
-    |> Enum.chunk_every(8)
-    |> Enum.with_index()
-    |> Enum.reduce([],fn {row, rank}, acc -> [Enum.map(row, fn {piece, file} -> {{8 - rank, 1 + file}, piece} end) | acc] end)
-    |> List.flatten()
-    |> Enum.reject(fn {_, piece} -> is_nil(piece) end)
-
-    Chess.init(board: board)
-  end
 end

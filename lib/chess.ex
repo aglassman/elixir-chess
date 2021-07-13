@@ -33,7 +33,7 @@ defmodule Chess do
     8 => "h"
   }
 
-  @defmodule """
+  @moduledoc """
   Game state is represented by a map defined by the state() type. Values include:
 
     location:
@@ -99,8 +99,8 @@ defmodule Chess do
   @doc """
   Attempt to apply the specified move to the given game state.
   """
-  @spec move(state(), move()) :: state() | {:error, string()}
-  def move(%{current: color} = state, move) do
+  @spec move(state(), move()) :: state() | {:error, String.t()}
+  def move(state, move) do
     with {:ok, move} <- validate_move(state, move) do
       state
       |> move_piece(move)
@@ -110,11 +110,7 @@ defmodule Chess do
     end
   end
 
-  def move(_, _) do
-    {:error, "invalid move"}
-  end
-
-  def validate_move(state, {material, from, to} = move) do
+  def validate_move(state, {material, from, _} = move) do
     with :ok <- validate_turn(state, material),
          {:location, ^material} <- {:location, Map.get(state, from)},
          {:ok, move} <- valid_piece_movement(state, move) do
@@ -210,7 +206,7 @@ defmodule Chess do
   # en passant
   def valid_piece_movement(
         state,
-        {{:black, :pawn} = piece, {from_rank, from_file}, {to_rank, to_file}} = move
+        {{:black, :pawn}, {from_rank, from_file}, {to_rank, to_file}} = move
       ) when from_file in [to_file + 1, to_file - 1] and from_rank - to_rank == 1 do
 
     case last_move(state) do
@@ -222,7 +218,7 @@ defmodule Chess do
 
   def valid_piece_movement(
         state,
-        {{:white, :pawn} = piece, {from_rank, from_file}, {to_rank, to_file}} = move
+        {{:white, :pawn}, {from_rank, from_file}, {to_rank, to_file}} = move
       ) when from_file in [to_file + 1, to_file - 1] and to_rank - from_rank == 1 do
 
     case last_move(state) |> IO.inspect do
@@ -261,7 +257,7 @@ defmodule Chess do
     {:current, "invalid movement: #{inspect(move)}"}
   end
 
-  def in_check(state, color) do
+  def in_check(_state, _color) do
     {:check, nil}
   end
 

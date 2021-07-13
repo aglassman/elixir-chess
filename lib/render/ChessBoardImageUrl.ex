@@ -2,6 +2,8 @@ defmodule Chess.Render.ChessBoardImageUrl do
   alias Chess.Render
   alias Chess.Notation.Fen
 
+  @behaviour Render
+
   @doc """
   options:
   show_last_move: boolean() - Will hilight the last move.
@@ -21,7 +23,7 @@ defmodule Chess.Render.ChessBoardImageUrl do
     "https://chessboardimage.com/#{fen}#{last_move}.png"
   end
 
-  defp last_move(%{moves: [{piece, {to_rank, to_file}, {from_rank, from_file}} | _]}) do
+  defp last_move(%{moves: [{_piece, {to_rank, to_file}, {from_rank, from_file}} | _]}) do
     "-#{Chess.file(from_file)}#{from_rank}#{Chess.file(to_file)}#{to_rank}"
   end
 
